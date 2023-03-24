@@ -25,11 +25,11 @@ hooks.Filters.ENV_PATCHES.add_item(
     (
         "openedx-lms-development-settings",
         """
-        MFE_CONFIG["LOGO_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-        MFE_CONFIG["LOGO_TRADEMARK_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-        MFE_CONFIG["LOGO_WHITE_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-        MFE_CONFIG["FAVICON_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-        """
+MFE_CONFIG["LOGO_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+MFE_CONFIG["LOGO_TRADEMARK_URL"]="https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+MFE_CONFIG["LOGO_WHITE_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+MFE_CONFIG["FAVICON_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+"""
     ),
 )
 
