@@ -21,16 +21,25 @@ hooks.Filters.ENV_PATCHES.add_item(
     )
 )
 
-hooks.Filters.ENV_PATCHES.add_item(
-    (
-        "openedx-lms-development-settings",
-        """
+hooks.Filters.ENV_PATCHES.add_items(
+    [
+        (
+            "openedx-lms-development-settings",
+            """
+FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False
+
+LOGO_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+LOGO_TRADEMARK_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+LOGO_WHITE_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+FAVICON_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+
 MFE_CONFIG["LOGO_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-MFE_CONFIG["LOGO_TRADEMARK_URL"]="https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
+MFE_CONFIG["LOGO_TRADEMARK_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
 MFE_CONFIG["LOGO_WHITE_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
 MFE_CONFIG["FAVICON_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-"""
-    ),
+    """
+        ),
+    ]
 )
 
 hooks.Filters.CONFIG_DEFAULTS.add_items(
