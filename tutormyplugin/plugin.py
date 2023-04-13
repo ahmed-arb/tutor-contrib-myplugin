@@ -14,32 +14,6 @@ from .__about__ import __version__
 # CONFIGURATION
 ########################################
 
-hooks.Filters.ENV_PATCHES.add_item(
-    (
-        "openedx-lms-common-settings",
-        "FEATURES['ALLOW_PUBLIC_ACCOUNT_CREATION'] = False"
-    )
-)
-
-hooks.Filters.ENV_PATCHES.add_items(
-    [
-        (
-            "openedx-lms-development-settings",
-            """
-LOGO_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-LOGO_TRADEMARK_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-LOGO_WHITE_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-FAVICON_URL = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-
-MFE_CONFIG["LOGO_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-MFE_CONFIG["LOGO_TRADEMARK_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-MFE_CONFIG["LOGO_WHITE_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-MFE_CONFIG["FAVICON_URL"] = "https://d19mbak9hk3cwy.cloudfront.net/wp-content/uploads/2022/10/edly-site-logo-new.svg"
-    """
-        ),
-    ]
-)
-
 hooks.Filters.CONFIG_DEFAULTS.add_items(
     [
         # Add your new settings that have default values here.
@@ -49,104 +23,41 @@ hooks.Filters.CONFIG_DEFAULTS.add_items(
     ]
 )
 
-hooks.Filters.CONFIG_UNIQUE.add_items(
-    [
-        # Add settings that don't have a reasonable default for all users here.
-        # For instance: passwords, secret keys, etc.
-        # Each new setting is a pair: (setting_name, unique_generated_value).
-        # Prefix your setting names with 'MYPLUGIN_'.
-        # For example:
-        ### ("MYPLUGIN_SECRET_KEY", "{{ 24|random_string }}"),
-    ]
-)
+config = {
+    "defaults": {
+        "COURSES_MFE_APP":{
+            "name": "courses",
+            "repository": "https://github.com/ahmed-arb/frontend-app-courses.git",
+            "port": 2010,
+        }
+    },
+}
 
-hooks.Filters.CONFIG_OVERRIDES.add_items(
-    [
-        # Danger zone!
-        # Add values to override settings from Tutor core or other plugins here.
-        # Each override is a pair: (setting_name, new_value). For example:
-        ### ("PLATFORM_NAME", "My platform"),
-    ]
-)
-
-
-########################################
-# INITIALIZATION TASKS
-########################################
-
-# To add a custom initialization task, create a bash script template under:
-# tutormyplugin/templates/myplugin/jobs/init/
-# and then add it to the MY_INIT_TASKS list. Each task is in the format:
-# ("<service>", ("<path>", "<to>", "<script>", "<template>"))
-MY_INIT_TASKS: list[tuple[str, tuple[str, ...]]] = [
-    # For example, to add LMS initialization steps, you could add the script template at:
-    # tutormyplugin/templates/myplugin/jobs/init/lms.sh
-    # And then add the line:
-    ### ("lms", ("myplugin", "jobs", "init", "lms.sh")),
+MY_MFES = [
+    {
+        "name": "courses",
+        "tag":  "ahmedkhalid19/course-mfe-dev"
+    }
 ]
 
+hooks.Filters.CONFIG_DEFAULTS.add_items(
+    [(f"MFE_{key}", value) for key, value in config.get("defaults", {}).items()]
 
-# For each task added to MY_INIT_TASKS, we load the task template
-# and add it to the CLI_DO_INIT_TASKS filter, which tells Tutor to
-# run it as part of the `init` job.
-for service, template_path in MY_INIT_TASKS:
-    full_path: str = pkg_resources.resource_filename(
-        "tutormyplugin", os.path.join("templates", *template_path)
+for mfe in MY_MFES:
+    name = f"{mfe['name']}-dev"
+    tag = mfe['tag']
+    hooks.Filters.IMAGES_BUILD.add_item(
+        (
+            name,
+            ("plugins", "mfe", "build", "mfe"),
+            tag,
+            (f"--target={mfe}-dev",),
+        )
     )
-    with open(full_path, encoding="utf-8") as init_task_file:
-        init_task: str = init_task_file.read()
-    hooks.Filters.CLI_DO_INIT_TASKS.add_item((service, init_task))
+    hooks.Filters.IMAGES_PULL.add_item((name, tag))
+    hooks.Filters.IMAGES_PUSH.add_item((name, tag))
 
 
-########################################
-# DOCKER IMAGE MANAGEMENT
-########################################
-
-
-# Images to be built by `tutor images build`.
-# Each item is a quadruple in the form:
-#     ("<tutor_image_name>", ("path", "to", "build", "dir"), "<docker_image_tag>", "<build_args>")
-hooks.Filters.IMAGES_BUILD.add_items(
-    [
-        # To build `myimage` with `tutor images build myimage`,
-        # you would add a Dockerfile to templates/myplugin/build/myimage,
-        # and then write:
-        ### (
-        ###     "myimage",
-        ###     ("plugins", "myplugin", "build", "myimage"),
-        ###     "docker.io/myimage:{{ MYPLUGIN_VERSION }}",
-        ###     (),
-        ### ),
-    ]
-)
-
-
-# Images to be pulled as part of `tutor images pull`.
-# Each item is a pair in the form:
-#     ("<tutor_image_name>", "<docker_image_tag>")
-hooks.Filters.IMAGES_PULL.add_items(
-    [
-        # To pull `myimage` with `tutor images pull myimage`, you would write:
-        ### (
-        ###     "myimage",
-        ###     "docker.io/myimage:{{ MYPLUGIN_VERSION }}",
-        ### ),
-    ]
-)
-
-
-# Images to be pushed as part of `tutor images push`.
-# Each item is a pair in the form:
-#     ("<tutor_image_name>", "<docker_image_tag>")
-hooks.Filters.IMAGES_PUSH.add_items(
-    [
-        # To push `myimage` with `tutor images push myimage`, you would write:
-        ### (
-        ###     "myimage",
-        ###     "docker.io/myimage:{{ MYPLUGIN_VERSION }}",
-        ### ),
-    ]
-)
 
 
 ########################################
