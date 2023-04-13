@@ -42,6 +42,7 @@ MY_MFES = [
 
 hooks.Filters.CONFIG_DEFAULTS.add_items(
     [(f"MFE_{key}", value) for key, value in config.get("defaults", {}).items()]
+)
 
 for mfe in MY_MFES:
     name = f"{mfe['name']}-dev"
